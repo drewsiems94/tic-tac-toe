@@ -1,6 +1,6 @@
 
-arr = [["1"," | ","2"," | ","3"], ["---+---+---"], ["4"," | ","5"," | ","6"],
-["---+---+---"], ["7"," | ","8"," | ","9"]] 
+arr = [["1"," | ","2"," | ","3"], ["--+---+--"], ["4"," | ","5"," | ","6"],
+["--+---+--"], ["7"," | ","8"," | ","9"]] 
 
 flag = false
 
@@ -20,6 +20,7 @@ module Game
   end
 
   def Game.print_grid(grid)
+    print "\n"
     grid.each do |row|
       row.each do |char|
         print char
@@ -33,8 +34,6 @@ module Game
       if (row - player_choices).empty?
         return true
         break
-      else
-        return false
       end
     end
   end
@@ -56,12 +55,12 @@ class Player
   end
 end 
 
-puts "Let's play Tic-Tac-Toe!"
+puts "Let's play Tic-Tac-Toe!\n"
 puts "\nPlease enter the name of Player 1: "
 player_one = gets.chomp
 puts "\nPlease enter the name of Player 2: "
 player_two = gets.chomp
-puts "\nOkay, #{player_one} will be X and #{player_two} will be O!\n"
+puts "\nOkay, #{player_one} will be X and #{player_two} will be O!"
 
 player_one = Player.new(player_one, "X")
 player_two = Player.new(player_two, "O")
@@ -69,30 +68,31 @@ player_two = Player.new(player_two, "O")
 Game.print_grid(arr)
 
 i = 0
-while i < 9
+while i <= 4
 
-  if i == 8
-    puts "It's a tie!"
-  end
 
   player_one.pick_square
   arr = Game.update_grid(arr, player_one.moves[i], player_one.marker)
   Game.print_grid(arr)
   if Game.check_winner(player_one.moves) == true
-    puts "GAME OVER! #{player_one.name} is the winner!"
+    puts "\nGAME OVER! #{player_one.name} is the winner!"
     break
   end
-  i += 1
+
+  if i == 4
+    puts "\nIt's a tie!"
+    break
+  end
 
   player_two.pick_square
   arr = Game.update_grid(arr, player_two.moves[i], player_two.marker)
   Game.print_grid(arr)
   if Game.check_winner(player_two.moves) == true
-    puts "GAME OVER! #{player_two.name} is the winner!"
+    puts "\nGAME OVER! #{player_two.name} is the winner!"
     break
   end
-  i += 1
 
+  i += 1
 end
 
 
