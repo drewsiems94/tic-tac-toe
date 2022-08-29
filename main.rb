@@ -44,9 +44,13 @@ class Game
   def make_move(player)
     puts "\n#{player.name}, please pick an available square (1-9): "
     square = gets.chomp
+    until @available_positions.include?(square)
+      puts "\nThat square is unavailable, please pick an available square (1-9): "
+      square = gets.chomp
+    end
     player.moves.push(square)
     @available_positions.delete(square)
-    @grid.each do |row|
+    grid.each do |row|
       if row.include?(square)
         index = row.index(square)
         row[index] = player.symbol
@@ -84,7 +88,8 @@ end
 
 # This class stores a player's name, symbol and moves made
 class Player
-  attr_accessor :name, :symbol, :moves
+  attr_reader :name, :symbol
+  attr_accessor :moves
 
   def initialize(num)
     puts "\nPlease enter the name of Player #{num}: "
