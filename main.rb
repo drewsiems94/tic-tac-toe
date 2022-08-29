@@ -1,25 +1,61 @@
+# frozen_string_literal: true
 
-arr = [["1"," | ","2"," | ","3"], ["--+---+--"], ["4"," | ","5"," | ","6"],
-["--+---+--"], ["7"," | ","8"," | ","9"]] 
+# The main class for running the game
+class Game
+  attr_accessor :grid
 
-flag = false
+  def initialize(player_one, player_two)
+    @player_one = player_one
+    @player_two = player_two
+    @grid = [
+      ['1', ' | ', '2', ' | ', '3'],
+      ['--+---+--'],
+      ['4', ' | ', '5', ' | ', '6'],
+      ['--+---+--'],
+      ['7', ' | ', '8', ' | ', '9']
+    ]
+    @available_positions = %w[1 2 3 4 5 6 7 8 9]
+  end
 
-module Game
-  WINNING_COMBOS = [["1","2","3"], ["4","5","6"], ["7","8","9"], ["1","4","7"], 
-  ["2","5","8"], ["3","6","9"], ["1","5","9"], ["3","5","7"]]
+  def play_game
+    print_grid
+    player = @player_one
+    loop do
+      make_move(player)
+      print_grid
+      if check_tie == true
+        puts "\nIt's a tie."
+        break
+      end
+      if check_winner(player.moves) == true
+        puts "\n#{player.name} wins!"
+        break
+      end
+      player == @player_one ? player = @player_two : player = @player_one
+    end
+  end
 
-  def Game.update_grid(grid, choice, marker)
-    grid.each do |row|
-      if row.include?(choice)
-        index = row.index(choice)
-        row[index] = marker
+  private
+
+  def check_tie
+    return true if @available_positions.empty?
+  end
+
+  def make_move(player)
+    puts "\n#{player.name}, please pick an available square (1-9): "
+    square = gets.chomp
+    player.moves.push(square)
+    @available_positions.delete(square)
+    @grid.each do |row|
+      if row.include?(square)
+        index = row.index(square)
+        row[index] = player.symbol
         break
       end
     end
-    grid
   end
 
-  def Game.print_grid(grid)
+  def print_grid
     print "\n"
     grid.each do |row|
       row.each do |char|
@@ -29,71 +65,37 @@ module Game
     end
   end
 
-  def Game.check_winner(player_choices)
-    WINNING_COMBOS.each do |row|
-      if (row - player_choices).empty?
-        return true
-        break
-      end
+  def check_winner(player_choices)
+    winning_combos = [
+      %w[1 2 3],
+      %w[4 5 6],
+      %w[7 8 9],
+      %w[1 4 7],
+      %w[2 5 8],
+      %w[3 6 9],
+      %w[1 5 9],
+      %w[3 5 7]
+    ]
+    winning_combos.each do |row|
+      return true if (row - player_choices).empty?
     end
   end
-
 end
 
+# This class stores a player's name, symbol and moves made
 class Player
-  attr_accessor :name, :marker, :moves
-  include Game 
-  def initialize(name, marker)
-    self.name = name
-    self.marker = marker
-    self.moves = []
+  attr_accessor :name, :symbol, :moves
+
+  def initialize(num)
+    puts "\nPlease enter the name of Player #{num}: "
+    @name = gets.chomp
+    puts "\nPlayer #{num}, please enter the symbol you'd like to use: "
+    @symbol = gets.chomp
+    @moves = []
   end
-  def pick_square
-    puts "\n#{self.name}, please pick an available square (1-9): "
-    square = gets.chomp
-    self.moves.push(square)
-  end
-end 
-
-puts "Let's play Tic-Tac-Toe!\n"
-puts "\nPlease enter the name of Player 1: "
-player_one = gets.chomp
-puts "\nPlease enter the name of Player 2: "
-player_two = gets.chomp
-puts "\nOkay, #{player_one} will be X and #{player_two} will be O!"
-
-player_one = Player.new(player_one, "X")
-player_two = Player.new(player_two, "O")
-
-Game.print_grid(arr)
-
-i = 0
-while i <= 4
-
-
-  player_one.pick_square
-  arr = Game.update_grid(arr, player_one.moves[i], player_one.marker)
-  Game.print_grid(arr)
-  if Game.check_winner(player_one.moves) == true
-    puts "\nGAME OVER! #{player_one.name} is the winner!"
-    break
-  end
-
-  if i == 4
-    puts "\nIt's a tie!"
-    break
-  end
-
-  player_two.pick_square
-  arr = Game.update_grid(arr, player_two.moves[i], player_two.marker)
-  Game.print_grid(arr)
-  if Game.check_winner(player_two.moves) == true
-    puts "\nGAME OVER! #{player_two.name} is the winner!"
-    break
-  end
-
-  i += 1
 end
 
-
-
+p1 = Player.new(1)
+p2 = Player.new(2)
+tic_tac_toe = Game.new(p1, p2)
+tic_tac_toe.play_game
